@@ -100,48 +100,48 @@ input:focus {
 
 /* Hide the default checkbox */
 .retro-checkbox {
-    display: none;
-  }
-  
-  /* Style the label to look like a retro checkbox */
-  .retro-checkbox + label {
-    position: relative;
-    padding-left: 30px; /* Room for the checkbox and some space */
-    cursor: pointer;
-    display: inline-block;
-    line-height: 24px; /* Adjust to vertically center the text with the checkbox. */
-  }
-  
-  /* Style the background of the checkbox using ::before */
-  .retro-checkbox + label::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 20px;
-    height: 20px;
-    background-color: #f5e6d8;
-    border: 2px solid #7c3e3e;
-    cursor: pointer;
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-  }
-  
-  /* Hover effect on the custom checkbox */
-  .retro-checkbox + label:hover::before {
-    background-color: #e5d6c8; /* Adjust color as per your preference */
-  }
-  
-  /* Style the checkmark using the ::after pseudo-element */
-  .retro-checkbox:checked + label::after {
-    content: "\25A0";
-    position: absolute;
-    top: 13px; /* Adjust this value so the checkmark appears over the custom checkbox area */
-    left: 7.5px; /* Adjust this value so the checkmark appears over the custom checkbox area */
-    transform: translateY(-50%); /* Vertically center the checkmark */
-    font-size: 16px;
-    font-weight: bold;
-    color: #7c3e3e;
-  }
+  display: none;
+}
+
+/* Style the label to look like a retro checkbox */
+.retro-checkbox + label {
+  position: relative;
+  padding-left: 30px; /* Room for the checkbox and some space */
+  cursor: pointer;
+  display: inline-block;
+  line-height: 24px; /* Adjust to vertically center the text with the checkbox. */
+}
+
+/* Style the background of the checkbox using ::before */
+.retro-checkbox + label::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background-color: #f5e6d8;
+  border: 2px solid #7c3e3e;
+  cursor: pointer;
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+/* Hover effect on the custom checkbox */
+.retro-checkbox + label:hover::before {
+  background-color: #e5d6c8; /* Adjust color as per your preference */
+}
+
+/* Style the checkmark using the ::after pseudo-element */
+.retro-checkbox:checked + label::after {
+  content: "\25A0";
+  position: absolute;
+  top: 13px; /* Adjust this value so the checkmark appears over the custom checkbox area */
+  left: 7.5px; /* Adjust this value so the checkmark appears over the custom checkbox area */
+  transform: translateY(-50%); /* Vertically center the checkmark */
+  font-size: 16px;
+  font-weight: bold;
+  color: #7c3e3e;
+}
 
 .result-card h2 {
   margin-top: 0;
@@ -312,52 +312,85 @@ label:hover .tooltip-text {
 
 /* Base style */
 .hljs {
-    display: block;
-    overflow-x: auto;
-    padding: 10px;
-    font-family: 'Courier New', Courier, monospace; /* Monospace font for retro feel */
-    color: #a86969; /* Darker text on the light background */
-    background: #f5e6d8;
-  }
-  
-  /* Punctuation, like braces and commas */
-  .hljs-punctuation, .hljs-symbol {
-    color: #a86969;
-  }
-  
-  /* JSON keys or properties */
-  .hljs-attr {
-    color: #7c3e3e; /* A hue that remains consistent with the retro theme */
-  }
-  
-  /* String values */
-  .hljs-string {
-    color: #5a3f3f; /* A darker hue for better contrast on a light background */
-  }
-  
-  /* Number values */
-  .hljs-number {
-    color: #8b6e6e; /* A neutral hue for numbers */
-  }
-  
-  /* Boolean values */
-  .hljs-literal {
-    color: #8b6e6e; /* A neutral hue for booleans and null values */
-  }
-  
-  /* Meta and other categories */
-  .hljs-meta, .hljs-meta-keyword, .hljs-meta-string {
-    color: #a86969;
-  }
-  
-  /* Selectors, tags, and attributes for other languages */
-  .hljs-tag, .hljs-selector-id, .hljs-selector-class, .hljs-name {
-    color: #a86969;
-  }
-  
-  /* Comments */
-  .hljs-comment {
-    color: #5a3f3f;
-    font-style: italic;
-  }
-  
+  display: block;
+  overflow-x: auto;
+  padding: 10px;
+  font-family: "Courier New", Courier, monospace; /* Monospace font for retro feel */
+  color: #a86969; /* Darker text on the light background */
+  background: #f5e6d8;
+}
+
+/* Punctuation, like braces and commas */
+.hljs-punctuation,
+.hljs-symbol {
+  color: #a86969;
+}
+
+/* JSON keys or properties */
+.hljs-attr {
+  color: #7c3e3e; /* A hue that remains consistent with the retro theme */
+}
+
+/* String values */
+.hljs-string {
+  color: #5a3f3f; /* A darker hue for better contrast on a light background */
+}
+
+/* Number values */
+.hljs-number {
+  color: #8b6e6e; /* A neutral hue for numbers */
+}
+
+/* Boolean values */
+.hljs-literal {
+  color: #8b6e6e; /* A neutral hue for booleans and null values */
+}
+
+/* Meta and other categories */
+.hljs-meta,
+.hljs-meta-keyword,
+.hljs-meta-string {
+  color: #a86969;
+}
+
+/* Selectors, tags, and attributes for other languages */
+.hljs-tag,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-name {
+  color: #a86969;
+}
+
+/* Comments */
+.hljs-comment {
+  color: #5a3f3f;
+  font-style: italic;
+}
+
+/* Remove default appearance */
+select {
+  -webkit-appearance: none; /* For Safari and Chrome */
+  appearance: none;
+  /* Add your styles below */
+  background-color: #f5e6d8;
+  border: 1px solid #a86969;
+  border-radius: 0rem;
+  padding: 8px;
+  font-family: "Courier New", Courier, monospace;
+  color: #7c3e3e;
+}
+
+/* Add a custom arrow for the dropdown */
+select::-webkit-inner-spin-button,
+select::-webkit-outer-spin-button {
+  display: none; /* Remove the default arrow in Chrome */
+}
+
+select::after {
+  /* Custom arrow for Safari and other browsers */
+  content: "\25BC"; /* Down arrow symbol */
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  pointer-events: none; /* Makes sure the dropdown still works */
+}
