@@ -25,6 +25,7 @@ class App {
       patientEverythingToggleContainer: document.getElementById(
         "patient-everything-toggle-container"
       ),
+      editButton: document.getElementById("edit-button"),
     };
   }
 
@@ -42,6 +43,9 @@ class App {
       // Setup event listeners for the UI elements based on the capability statement
       this.setupEventListeners(capabilityStatement);
     }
+
+    // Build the query string when the page loads
+    this.buildQueryString();
   }
 
   // Asynchronous function to fetch and validate the capability statement
@@ -112,22 +116,55 @@ class App {
 
     // Set up the event listeners for the pagination buttons
     this.setupPaginationButtons();
+
+    // Add an event listener to the "Edit" button that opens the edit page when clicked
+    this.getElement.editButton.addEventListener("click", () =>
+      this.openEditPage(this.currentResource)
+    );
+
+    // Add an event listener to the read operation toggle
+    this.getElement.readOperationToggle.addEventListener("change", () => {
+      this.buildQueryString();
+    });
+
+    // Add an event listener to the patient everything operation toggle
+    this.getElement.patientEverythingToggle.addEventListener("change", () => {
+      this.buildQueryString();
+    });
+  }
+
+  openEditPage(resource) {
+    // Get the JSON representation of the FHIR resource
+    const resourceJson = JSON.stringify(resource, null, 2);
+
+    // Encode the JSON string so it can be included in a URL
+    const encodedJson = encodeURIComponent(resourceJson);
+
+    // Get the server URL
+    const serverUrl = this.getElement.serverUrl.value;
+
+    // Encode the server URL so it can be included in a URL
+    const encodedServerUrl = encodeURIComponent(serverUrl);
+
+    // Open the edit page in a new tab and pass the JSON and server URL as URL parameters
+    window.open(
+      `./pages/editor.html?resource=${encodedJson}&serverUrl=${encodedServerUrl}`,
+      "_blank"
+    );
   }
 
   // Function to set up event listeners for pagination buttons
   setupPaginationButtons() {
     // Add an event listener to the "Next Page" button
     // When the button is clicked, it retrieves the next page of results
-    this.getElement.nextPageButton.addEventListener(
-      "click",
-      () => this.getNextPage()
+    this.getElement.nextPageButton.addEventListener("click", () =>
+      this.getNextPage()
     );
 
     // Add an event listener to the "Previous Page" button
     // When the button is clicked, it retrieves the previous page of results
-    this.getElement.previousPageButton.addEventListener(
-      "click",
-      () => this.getPreviousPage()
+    this.getElement.previousPageButton.addEventListener("click", () =>
+      this.getPreviousPage()
     );
   }
 
@@ -156,6 +193,9 @@ class App {
 
     // Populate the parameters for the selected resource based on the capability statement
     this.populateParameters(selectedResource, capabilityStatement);
+
+    // Build the query string when the resource type is changed
+    this.buildQueryString();
   }
 
   // Function to handle the event when the form is submitted
@@ -238,25 +278,30 @@ class App {
 
   // Method to handle addition of a new parameter by the user
   addParameter() {
-    // Retrieve user input for parameter name and value
     const parameterName = this.getElement.parameterNameInput.value;
     const parameterValue = this.getElement.parameterValueInput.value;
 
-    // If both parameter name and value are not empty
     if (parameterName && parameterValue) {
-      // Create a container element to display the user added parameter
-      const parameterContainer = this.createParameterContainer(
-        parameterName,
-        parameterValue
-      );
+      let parameterContainer;
+      if (this.getElement.addParameterButton.dataset.editing) {
+        const parameterContainerId =
+          this.getElement.addParameterButton.dataset.editing;
+        parameterContainer = document.getElementById(parameterContainerId);
+        parameterContainer.querySelector(".userParameterName").innerText =
+          parameterName;
+        parameterContainer.querySelector(".userParameterValue").innerText =
+          parameterValue;
+        this.getElement.addParameterButton.innerText = "Add Parameter";
+        delete this.getElement.addParameterButton.dataset.editing;
+      } else {
+        parameterContainer = this.createParameterContainer(
+          parameterName,
+          parameterValue
+        );
+        this.getElement.parametersContainer.appendChild(parameterContainer);
+      }
 
-      // Append this new parameter container to the parameters container element
-      this.getElement.parametersContainer.appendChild(parameterContainer);
-
-      // Rebuild the query string to include this new parameter
       this.buildQueryString();
-
-      // Clear the parameter input fields for next entry
       this.getElement.parameterNameInput.value = "";
       this.getElement.parameterValueInput.value = "";
     }
@@ -320,11 +365,14 @@ class App {
     const searchParams = collectSearchParams();
 
     // Create an instance of URLSearchParams with the collected search parameters
-    const queryParams = new URLSearchParams(searchParams);
+    const queryParams = new URLSearchParams();
+    for (const [key, value] of searchParams) {
+      queryParams.append(key, value);
+    }
 
     // Check if the read operation toggle is checked
     const isReadOperation = this.getElement.readOperationToggle.checked;
-    
+
     // Check if the patient everything operation is checked and the selected resource is 'Patient'
     const isPatientEverything =
       this.getElement.patientEverythingToggle.checked &&
@@ -333,32 +381,32 @@ class App {
     // Start building the URL with the server URL and the selected resource
     let queryString = `${serverUrl}/${resourceType}`;
 
-    // If it's a read operation and there's an _id parameter, append it to the URL
-    if (isReadOperation && searchParams._id) {
-      // Read operation
-      queryString += `/${searchParams._id}`;
-    } else if (isPatientEverything) {
-      // If it's a patient everything operation, append '$everything' to the URL
+    // Find the _id parameter in the searchParams array
+    const idParam = searchParams.find((param) => param[0] === "_id");
+
+    // If it's a patient everything operation, append '$everything' to the URL
+    if (isPatientEverything) {
       // If there's an _id parameter, append it to the URL before '$everything'
-      if (searchParams._id) {
+      if (idParam) {
         // Patient $everything operation with _id
-        queryString += `/${searchParams._id}/$everything`;
+        queryString += `/${idParam[1]}/$everything`;
+        // Remove the _id parameter from the queryParams
         queryParams.delete("_id");
       } else {
         // Patient $everything operation without _id
         queryString += `/$everything`;
       }
-
-      //TODO - I think this IF/ELSE statement is doing the same thing
-      // If there are any parameters left after deleting _id, append them to the URL
-      if (queryParams.toString().length > 0) {
-        queryString += `?${queryParams}`;
-      }
-    } else {
-      // If there are any parameters, append them to the URL
-      const hasSearchParams = Array.from(queryParams).length > 0;
-      queryString += `${hasSearchParams ? "?" : ""}${queryParams}`;
+    } else if (isReadOperation && idParam) {
+      // If it's a read operation and there's an _id parameter, append it to the URL
+      // Read operation
+      queryString += `/${idParam[1]}`;
+      // Remove the _id parameter from the queryParams
+      queryParams.delete("_id");
     }
+
+    // If there are any parameters, append them to the URL
+    const hasSearchParams = Array.from(queryParams).length > 0;
+    queryString += `${hasSearchParams ? "?" : ""}${queryParams}`;
 
     // Update the query string output text in the form
     if (this.getElement.queryStringOutput) {
@@ -460,6 +508,8 @@ class App {
     const cardBody = createCardBody(resource);
 
     card.appendChild(cardBody);
+
+    // Add an event listener to the card
     card.addEventListener("click", () => {
       const jsonString = JSON.stringify(resource, null, 2);
 
@@ -481,13 +531,23 @@ class App {
           this.getElement.modal.style.display = "none";
         }
       };
+
+      // Store the current resource
+      this.currentResource = resource;
+
+      // Show the "Edit" button
+      this.getElement.editButton.style.display = "block";
     });
 
     return card;
   }
+
   createParameterContainer(parameterName, parameterValue) {
     const parameterContainer = document.createElement("div");
     parameterContainer.classList.add("form-group");
+
+    // Assign an id to the parameterContainer
+    parameterContainer.id = `param-${parameterName}`;
 
     const parameterNameElement = document.createElement("span");
     parameterNameElement.classList.add("userParameterName");
@@ -498,18 +558,38 @@ class App {
     parameterValueElement.classList.add("userParameterValue");
     parameterValueElement.innerText = parameterValue;
 
+    const editButton = document.createElement("button");
+    editButton.classList.add("edit-button");
+    editButton.classList.add("btn");
+    editButton.innerText = "Edit";
+    editButton.addEventListener("click", (e) => {
+      e.preventDefault(); // Prevent the form from being submitted
+      this.getElement.parameterNameInput.value = parameterName;
+      this.getElement.parameterValueInput.value = parameterValue;
+      this.getElement.addParameterButton.innerText = "Update Parameter";
+      this.getElement.addParameterButton.dataset.editing = parameterContainer;
+      this.getElement.addParameterButton.dataset.editing =
+        parameterContainer.id;
+    });
+
     const removeButton = document.createElement("button");
     removeButton.classList.add("remove-button");
     removeButton.classList.add("btn");
-    removeButton.innerText = "x";
+    removeButton.innerText = "Remove";
     removeButton.addEventListener("click", () => {
       parameterContainer.remove();
       this.buildQueryString();
     });
 
+    const buttonContainer = document.createElement("div");
+    buttonContainer.classList.add("button-container");
+
+    buttonContainer.appendChild(editButton);
+    buttonContainer.appendChild(removeButton);
+
     parameterContainer.appendChild(parameterNameElement);
     parameterContainer.appendChild(parameterValueElement);
-    parameterContainer.appendChild(removeButton);
+    parameterContainer.appendChild(buttonContainer);
 
     return parameterContainer;
   }
@@ -596,7 +676,7 @@ function createTokenInput(parameter) {
 }
 
 function collectSearchParams() {
-  const searchParams = {};
+  const searchParams = [];
 
   document
     .querySelectorAll(
@@ -604,7 +684,7 @@ function collectSearchParams() {
     )
     .forEach((input) => {
       if (input.value !== "") {
-        searchParams[input.name] = input.value;
+        searchParams.push([input.name, input.value]);
       }
     });
 
@@ -621,7 +701,7 @@ function collectSearchParams() {
       const parameterValue = parameterValueElement.innerText;
 
       if (parameterName && parameterValue) {
-        searchParams[parameterName] = parameterValue;
+        searchParams.push([parameterName, parameterValue]);
       }
     }
   });

@@ -38,12 +38,12 @@
                 </div>
                 <div class="form-group form-operation-toggle">
                     <input type="checkbox" id="read-operation-toggle" name="read-operation-toggle" class="retro-checkbox">
-                    <label for="read-operation-toggle">_id Read Operation<span class="tooltip-text">If checked the _id string will be formatted as [Resource]/[Id] instead of [Resource]?_id=[Id]</span>
+                    <label for="read-operation-toggle">_id Read Operation Override<span class="tooltip-text">If checked the _id value will be formatted in the search string as [Resource]/{id} instead of [Resource]?_id={id}</span>
                     </label>
                 </div>
                 <div class="form-group" id="patient-everything-toggle-container" style="display: none;">
                     <input type="checkbox" id="patient-everything-toggle" name="patient-everything-toggle" class="retro-checkbox">
-                    <label for="patient-everything-toggle">Patient $everything Operation<span class="tooltip-text">If checked followed by an _id parameter the query string will be formatted as Patient/[Id]/$everything</span>
+                    <label for="patient-everything-toggle">Patient $everything Operation<span class="tooltip-text">Appends $everything to the request. If provided, the _id value will be formatted in the search string as Patient/{id}/$everything</span>
                     </label>
                 </div>
             </div>
@@ -75,6 +75,7 @@
         <div class="modal-content">
             <span id="close-modal" class="close">&times;</span>
             <pre><code id="json-display" class="language-json json-display"></code></pre>
+            <button class="btn" id="edit-button" style="display: none;">Edit</button>
         </div>
     </div>
     <script src="app.js"></script>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit FHIR Resource</title>
+    <link rel="stylesheet" href="../resources/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit FHIR Resource</h1>
+        <div class="server-container">
+            <div class="form-group">
+                <label for="server-url">Server URL:</label>
+                <input type="text" id="server-url">
+            </div>
+            <div class="form-group">
+                <label for="http-method">HTTP Method:</label>
+                <select id="http-method">
+                    <option value="PUT">PUT</option>
+                    <option value="POST">POST</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button class="btn" id="save-button">Save Resource</button>
+            </div>
+        </div>
+        <div class="server-container">
+            <div class="form-group">
+                <textarea id="json-editor"></textarea>
+            </div>
+        </div>
+        <div id="json-modal" class="modal">
+            <div class="modal-content">
+                <span id="close-modal" class="close">&times;</span>
+                <pre><code id="json-display" class="language-json json-display"></code></pre>
+            </div>
+        </div>
+    </div>
+    <script src="editor.js"></script>
+</body>
+
+</html>
